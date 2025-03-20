@@ -26,21 +26,32 @@ def get_features_dict(data, list_feat):
     return feature_map
         
         
-def create_training_data(feature_map, features, target):
+def create_data(feature_map, features, target, partition):
     training_data = []
     training_target=[]
-    n_samples = len(feature_map[features[0]])-200
+    testing_data = []
+    testing_labels = []
+    n_training = round(len(feature_map[features[0]])*partition)
+    n_testing = round(len(feature_map[features[0]])*(1-partition))
+    print(n_training,n_testing)
 
-    for i in range(n_samples):
-        # Create a feature vector for sample i using the provided features
+    for i in range(n_training):
+
         feature_vector = [feature_map[feat][i] for feat in features]
-        # Get the corresponding target value for sample i
+
         target_value = feature_map[target][i] if target in feature_map else None
-        # Append a tuple (feature_vector, target_value) to training_data
+
         training_data.append(feature_vector)
         training_target.append(target_value)
 
-    return training_data, training_target
+    for i in range(n_training,n_testing+n_training,1):
+        feature_vector = [feature_map[feat][i] for feat in features]
+        target_value = feature_map[target][i] if target in feature_map else None
+        
+        testing_data.append(feature_vector)
+        testing_labels.append(target_value)
+
+    return training_data, training_target, testing_data, testing_labels
 
         
 
