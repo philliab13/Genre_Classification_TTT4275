@@ -30,7 +30,7 @@ def knn_predict(training_data, training_labels, test_points, k):
         predictions.append(Counter(k_nearest_labels).most_common(1)[0][0])
     return predictions
 
-#Recall and presicion are worth looking into in task 1, to determine how well the classifier is doing
+#Recall and presicion are worth looking into in task 1, to determine how well the classifier is doing,  this is in the last powerpoint presented. 
 prediction = knn_predict(training_data, training_labels, testing_data, 5)
 acc=metrics.accuracy_score(testing_labels, prediction)
 print(f"Accuracy testing points: {acc}")
