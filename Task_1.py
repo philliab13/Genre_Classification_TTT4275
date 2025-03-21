@@ -30,7 +30,7 @@ def knn_predict(training_data, training_labels, test_points, k):
         predictions.append(Counter(k_nearest_labels).most_common(1)[0][0])
     return predictions
 
-
+#Recall and presicion are worth looking into in task 1, to determine how well the classifier is doing
 prediction = knn_predict(training_data, training_labels, testing_data, 5)
 acc=metrics.accuracy_score(testing_labels, prediction)
 print(f"Accuracy testing points: {acc}")
@@ -38,5 +38,11 @@ print(f"Accuracy testing points: {acc}")
 prediction = knn_predict(training_data, training_labels, training_data, 5)
 acc=metrics.accuracy_score(training_labels, prediction)
 print(f"Accuracy training points: {acc}")
+
+#Task 2, look at scatterplot or histograms of the data, that could explain why the classifier has low accuracy. The task asks you to look at each of the different features in the different genres and see how much they overlap. So one plot is the tempo of each genre, and you see how much they overlap for each of them, the more they overlap, the harder it is for the classifier to classify them.
+
+#Task 3, find out which features are most important for the classifier, that could be done by removing one feature at a time and see how much the accuracy drops.
+
+#Task 4, this is the largest task, this could be done using a lot of different classifiers. Can use whichever calssifier I wwant, I just have to make sure that I explain why I chose that classifier, why it is good for this task, and dont just use sklearn and build a classifier, I have to build it from scratch.
 
 
