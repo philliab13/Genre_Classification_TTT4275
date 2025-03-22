@@ -16,3 +16,5 @@
 # /
 # MSW
 # F=MSB/MSW.
+
+#Should probably also look in the book if there is a way they are choosing features, and use the same method. 
