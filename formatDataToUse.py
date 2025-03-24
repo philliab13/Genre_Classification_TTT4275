@@ -54,4 +54,21 @@ def create_data(feature_map, features, target, partition):
     return training_data, training_target, testing_data, testing_labels
 
         
+def normalize_data_min_max(data):
+    minimum=np.min(data, axis=0)
+    maximum=np.max(data, axis=0)
+    normalized_data=(data-minimum)/(maximum-minimum)
+    return normalized_data
+
+def normalize_z_score(data):
+    data = np.array(data)  # 
+    n_samples, n_features = data.shape
+ 
+    mean_each_feat = np.mean(data, axis=0)
+    variance_each_feat = np.var(data, axis=0, ddof=1)
+    norm_data=(data-mean_each_feat)/np.sqrt(variance_each_feat)
+    
+    return norm_data
+
+
 
