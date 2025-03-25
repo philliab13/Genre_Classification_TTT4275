@@ -13,6 +13,13 @@ def get_data(file):
 
     return data
 
+def get_all_features(data):
+    features=[]
+    for feat in data.columns:
+        if feat!="Track ID" and feat!="File" and feat!="GenreID" and feat!="Genre" and feat!="Type":
+            features.append(feat)
+    return features
+
 
 def get_features_dict(data, list_feat):
     feature_map = {}
@@ -153,5 +160,5 @@ def error_counting_approach(N_i,k_i,M):
     P=binomialCoeff(N_i,k_i)*(P_i**k_i)*((1-P_i)**(N_i-k_i))
     return P
 
-print(error_counting_approach(20,9,10))
+
     

@@ -1,8 +1,9 @@
 from formatDataToUse import *
 from plotting import *
+from Knn import *
 import matplotlib.pyplot as plt
 import numpy as np
-from collections import Counter
+
 import sklearn.metrics as metrics
 
 
@@ -18,24 +19,6 @@ z_norm_training_data=normalize_z_score(training_data)
 z_norm_testing_data=normalize_z_score(testing_data)
 
 #Might be worth looking into tanget distance as a measure to get more accurate results
-def euclidean_distance(point1, point2):
-    return np.sqrt(np.sum((np.array(point1) - np.array(point2))**2))
-
-
-
-
-def knn_predict(training_data, training_labels, test_points, k):
-    predictions = []
-    for j in range(len(test_points)):
-        distances = []
-        for i in range(len(training_data)):
-            dist = euclidean_distance(test_points[j], training_data[i])
-            distances.append((dist, training_labels[i]))
-        distances.sort(key=lambda x: x[0])
-        k_nearest_labels = [label for _, label in distances[:k]]
-        predictions.append(Counter(k_nearest_labels).most_common(1)[0][0])
-    return predictions
-
 #Performance without normalizing
 prediction_testing_points = knn_predict(training_data, training_labels, testing_data, 5)
 
