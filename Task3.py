@@ -1,3 +1,4 @@
+#Comparing tempo and spectral_centroid_mean from task 2, one can see that there is less overlap in the spectral_centroid_mean compared to tempo
 #This can probably be a good way of desciding the last feature:
 # You can compute a feature’s ANOVA F-score manually by comparing the variance between classes to the variance within classes. In other words, for each feature you’d do the following:
 

@@ -41,7 +41,7 @@ prediction_testing_points = knn_predict(training_data, training_labels, testing_
 
 classes = np.unique(testing_labels)
 #You get recall, precision, f1-score from this, this could also be done by looking at the confusion matrix and using the formulas from lecture 18
-report = metrics.classification_report(testing_labels, prediction_testing_points, target_names=[str(cls) for cls in classes])
+report = manual_classification_report(testing_labels, prediction_testing_points, [str(cls) for cls in classes])
 print(report)
 
 
@@ -53,7 +53,7 @@ plot_cm(cm,testing_labels)
 prediction_testing_points_norm = knn_predict(norm_training_data, training_labels, norm_testing_data, 5)
 
 #You get recall, precision, f1-score from this, this could also be done by looking at the confusion matrix and using the formulas from lecture 18
-report_norm = metrics.classification_report(testing_labels, prediction_testing_points_norm, target_names=[str(cls) for cls in classes])
+report_norm = manual_classification_report(testing_labels, prediction_testing_points_norm, [str(cls) for cls in classes])
 print(report_norm)
 
 
@@ -66,7 +66,7 @@ plot_cm(cm_norm,testing_labels)
 prediction_testing_points_norm_z = knn_predict(z_norm_training_data, training_labels, z_norm_testing_data, 5)
 
 #You get recall, precision, f1-score from this, this could also be done by looking at the confusion matrix and using the formulas from lecture 18
-report_norm_z = metrics.classification_report(testing_labels, prediction_testing_points_norm_z, target_names=[str(cls) for cls in classes])
+report_norm_z = manual_classification_report(testing_labels, prediction_testing_points_norm_z, [str(cls) for cls in classes])
 print(report_norm_z)
 
 
