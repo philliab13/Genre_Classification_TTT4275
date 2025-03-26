@@ -40,7 +40,6 @@ def create_data(feature_map, features, target, partition):
     testing_labels = []
     n_training = round(len(feature_map[features[0]])*partition)
     n_testing = round(len(feature_map[features[0]])*(1-partition))
-    print(n_training,n_testing)
 
     for i in range(n_training):
 
