@@ -1,21 +1,43 @@
-#Comparing tempo and spectral_centroid_mean from task 2, one can see that there is less overlap in the spectral_centroid_mean compared to tempo
-#This can probably be a good way of desciding the last feature:
-# You can compute a feature’s ANOVA F-score manually by comparing the variance between classes to the variance within classes. In other words, for each feature you’d do the following:
+import pandas as pd
 
-# Compute the overall mean of the feature.
-# For each class:
-# Compute the class mean.
-# Compute the contribution to the between-class sum of squares: multiply the number of samples in the class by the squared difference between the class mean and the overall mean.
-# Compute the contribution to the within-class sum of squares: sum the squared differences between each sample in that class and the class mean.
-# Calculate mean squares:
-# Mean square between (MSB) = (Between-class sum of squares) / (number of classes – 1)
-# Mean square within (MSW) = (Within-class sum of squares) / (total number of samples – number of classes)
-# F-score: The ratio 
-# 𝐹
-# =
-# MSB
-# /
-# MSW
-# F=MSB/MSW.
 
-#Should probably also look in the book if there is a way they are choosing features, and use the same method. 
+# Load dataset
+data = pd.read_csv("GenreClassData_30s.txt", sep="\t")  # adjust if needed
+
+
+# Define features and target
+#I want to design a filter that can remove features that have a variance below a certain threshold
+# The three features are predefined which are spectral_rolloff_mean, mfcc_1_mean, spectral_centroid_mean
+# The forth one is determined by the filter
+# Now we should create a function called filter_features that takes in the data and the threshold and returns the filtered
+
+def filter_features(data, threshold):
+    # Define features and target
+    features = ["spectral_rolloff_mean", "mfcc_1_mean", "spectral_centroid_mean"]
+    target = "GenreID"
+
+    # Extract features and target
+    X = data[features]
+    y = data[target]
+
+    #Calculate variance of each feature
+    variances = X.var()
+    print(variances)
+
+    # Filter features based on variance but implemented manually without importing any libraries
+    selected_features = []
+    for feature in X.columns:
+        if X[feature].var() >= threshold:
+            selected_features.append
+    
+
+    return selected_features
+
+# Test the function
+threshold = 0.1  # adjust if needed
+selected_feature = filter_features(data, threshold)
+print(selected_feature)
+
+
+
+
