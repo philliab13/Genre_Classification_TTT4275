@@ -28,6 +28,9 @@ from Knn import *
 from plotting import *
 from copy import deepcopy
 import sklearn.metrics as metrics
+import time
+
+start=time.time()
 
 def forward_selection(base_features,candidate_features,data):
     performance_history=[]
@@ -94,12 +97,13 @@ def forward_selection_one_feat(base_features,candidate_features,data):
 
 
 data=get_data("GenreClassData_30s.txt")
-# allFeatures=get_all_features(data)
-# print(allFeatures)
-# feat, score, liste = forward_selection_one_feat(["spectral_rolloff_mean","mfcc_1_mean", "spectral_centroid_mean"],allFeatures,data)
-# print("Best feature: ", feat)
-# print("Score: ", score )
-# print("Complete list: ", liste)
+allFeatures=get_all_features(data)
+print(allFeatures)
+feat, score, liste = forward_selection_one_feat(["spectral_rolloff_mean","mfcc_1_mean", "spectral_centroid_mean"],allFeatures,data)
+print("Best feature: ", feat)
+print("Score: ", score )
+print("Complete list: ", liste)
+end=time.time()
 
 feat_dict=get_features_dict(data, ["Track ID", "spectral_rolloff_mean", "mfcc_1_mean", "spectral_centroid_mean","rmse_var", "GenreID"])
 
@@ -131,6 +135,7 @@ print(report_norm_z)
 cm_norm_z  =metrics.confusion_matrix(testing_labels,prediction_testing_points_norm_z)
 
 plot_cm(cm_norm_z,testing_labels)
+print("Execution time: ", (end-start))
 #Normalizing it with the z-score seemed to help, maybe it will be worth trying to assume it is gaussian and see if that changes anything.
 
 #With the simplified version of forward selection it chose rmse_var as the feature that gave it the best overall accuracy, one can see that there are some genres that are very hard to classify. Look at the confusion matrix. 
