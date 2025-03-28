@@ -56,6 +56,7 @@ def forward_selection(base_features,candidate_features,data):
             z_norm_training_data=normalize_z_score(training_data)
             z_norm_testing_data=normalize_z_score(testing_data)
             pred=knn_predict(z_norm_training_data,training_labels, z_norm_testing_data,5)
+            #Nice work-> creating a function might be a good idea
             acc=metrics.accuracy_score(testing_labels,pred)
 
             scores_candidates.append((feature,acc))
