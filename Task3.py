@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from formatDataToUse import get_data, get_features_dict, create_data, normalize_data_min_max
+from formatDataToUse import *
 from collections import Counter
 from sklearn.metrics import classification_report, confusion_matrix
 
@@ -83,9 +83,10 @@ for i, f in enumerate(selected_features, 1):
 feat_dict = get_features_dict(data, selected_features + ["GenreID"])
 train_X, train_y, test_X, test_y = create_data(feat_dict, selected_features, "GenreID", 0.8)
 
-# Normalize with min-max scaling
-train_X = normalize_data_min_max(train_X)
-test_X = normalize_data_min_max(test_X)
+#normalization of data z-score
+train_X = normalize_z_score(train_X)
+test_X = normalize_z_score(test_X)
+
 
 # Implement k-NN (k=5)
 def euclidean_distance(p1, p2):
