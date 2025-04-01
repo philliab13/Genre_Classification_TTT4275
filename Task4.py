@@ -4,6 +4,7 @@
 import pandas as pd
 import numpy as np
 from pathlib import Path
+import sklearn.metrics as metrics
 
 # === Load all datasets ===
 def load_dataset(path):
@@ -32,6 +33,7 @@ X_norm = (X - X_mean) / X_std
 split_idx = int(0.8 * len(X_norm))
 X_train, X_test = X_norm[:split_idx], X_norm[split_idx:]
 y_train, y_test = y[:split_idx], y[split_idx:]
+print(len(X_train))
 
 # === One-hot encode labels ===
 def one_hot(y, num_classes):
@@ -145,3 +147,5 @@ for i in range(20):
     actual = true_classes[i]
     print(f"Sample {i+1}: Predicted = {GENRE_MAP[pred]} ({pred}), Actual = {GENRE_MAP[actual]} ({actual})")
 
+cm=metrics.confusion_matrix(y_test,predicted_classes)
+print(cm)
