@@ -123,7 +123,7 @@ print(report)
 
 cm  =metrics.confusion_matrix(testing_labels,prediction_testing_points)
 
-plot_cm(cm,testing_labels)
+plot_cm(cm,testing_labels, "task3_no_norm")
 
 #Performance with z-score normalizing
 prediction_testing_points_norm_z = knn_predict(z_norm_training_data, training_labels, z_norm_testing_data, 5)
@@ -135,7 +135,7 @@ print(report_norm_z)
 
 cm_norm_z  =metrics.confusion_matrix(testing_labels,prediction_testing_points_norm_z)
 
-plot_cm(cm_norm_z,testing_labels)
+plot_cm(cm_norm_z,testing_labels, "task3_norm_z")
 print("Execution time: ", (end-start))
 #Normalizing it with the z-score seemed to help, maybe it will be worth trying to assume it is gaussian and see if that changes anything.
 
