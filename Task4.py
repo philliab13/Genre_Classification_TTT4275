@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
+import numpy as np
+from pathlib import Path
 
 # === Load all datasets ===
 def load_dataset(path):
@@ -35,9 +36,8 @@ np.random.seed(42)  # For reproducibility
 indices = np.arange(len(X_norm))
 np.random.shuffle(indices)
 split_idx = int(0.8 * len(X_norm))
-X_train, X_test = X_norm[indices[:split_idx]], X_norm[indices[split_idx:]]
-y_train, y_test = y[indices[:split_idx]], y[indices[split_idx:]]
-print(f"Train set: {X_train.shape}, Test set: {X_test.shape}")
+X_train, X_test = X_norm[:split_idx], X_norm[split_idx:]
+y_train, y_test = y[:split_idx], y[split_idx:]
 
 # === One-hot encode labels ===
 def one_hot(y, num_classes):
@@ -210,22 +210,3 @@ for i in range(min(20, len(predicted_classes))):
     actual = true_classes[i]
     print(f"Sample {i+1}: Predicted = {GENRE_MAP[pred]} ({pred}), Actual = {GENRE_MAP[actual]} ({actual})")
 
-# Plot training progress
-try:
-    plt.figure(figsize=(12, 5))
-    plt.subplot(1, 2, 1)
-    plt.plot(train_losses)
-    plt.title('Training Loss')
-    plt.xlabel('Epochs')
-    plt.ylabel('Loss')
-
-    plt.subplot(1, 2, 2)
-    plt.plot(test_accuracies)
-    plt.title('Test Accuracy')
-    plt.xlabel('Epochs')
-    plt.ylabel('Accuracy')
-    plt.tight_layout()
-    plt.savefig('training_progress.png')
-    print("\nTraining progress plot saved as 'training_progress.png'")
-except Exception as e:
-    print(f"\nCouldn't create plot: {e}")
