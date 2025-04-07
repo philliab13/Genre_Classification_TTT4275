@@ -73,7 +73,7 @@ input_size = X_train.shape[1]
 hidden_size = 64  # Single hidden layer with 64 neurons, exactly as original
 output_size = num_classes
 learning_rate = 0.01  # Fixed learning rate as in original
-epochs = 400  # 50 epochs as in original
+epochs = 150  # 50 epochs as in original
 batch_size = 64  # 64 batch size as in original
 
 # Use the same initialization as original code
