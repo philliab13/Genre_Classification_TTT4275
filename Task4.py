@@ -3,11 +3,15 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # === Load all datasets ===
+
+
 def load_dataset(path):
     df = pd.read_csv(path, sep='\t')
     # Drop Track ID, File, Genre, Type as in your original code
-    df = df.drop(columns=["Track ID", "File", "Genre", "Type"], errors="ignore")
+    df = df.drop(columns=["Track ID", "File",
+                 "Genre", "Type"], errors="ignore")
     return df
+
 
 # Load all 3 datasets
 print("Loading datasets...")
@@ -40,31 +44,41 @@ y_train, y_test = y[indices[:split_idx]], y[indices[split_idx:]]
 print(f"Train set: {X_train.shape}, Test set: {X_test.shape}")
 
 # === One-hot encode labels ===
+
+
 def one_hot(y, num_classes):
     return np.eye(num_classes)[y]
+
 
 num_classes = len(np.unique(y))
 y_train_oh = one_hot(y_train, num_classes)
 y_test_oh = one_hot(y_test, num_classes)
 
 # === Neural Network Functions ===
+
+
 def relu(x):
     return np.maximum(0, x)
+
 
 def relu_derivative(x):
     return (x > 0).astype(float)
 
+
 def softmax(z):
     exp_scores = np.exp(z - np.max(z, axis=1, keepdims=True))  # stability
     return exp_scores / np.sum(exp_scores, axis=1, keepdims=True)
+
 
 def cross_entropy(predictions, targets):
     eps = 1e-9
     predictions = np.clip(predictions, eps, 1 - eps)
     return -np.sum(targets * np.log(predictions)) / predictions.shape[0]
 
+
 def accuracy(preds, labels):
     return np.mean(np.argmax(preds, axis=1) == np.argmax(labels, axis=1))
+
 
 # === Initialize Network with single hidden layer as in original code ===
 print("Initializing neural network...")
@@ -92,25 +106,25 @@ for epoch in range(epochs):
     np.random.shuffle(indices)
     X_train_shuffled = X_train[indices]
     y_train_oh_shuffled = y_train_oh[indices]
-    
+
     batch_losses = []
-    
+
     # Mini-batch gradient descent
     for start in range(0, X_train.shape[0], batch_size):
         end = min(start + batch_size, X_train.shape[0])
         x_batch = X_train_shuffled[start:end]
         y_batch = y_train_oh_shuffled[start:end]
-        
+
         # Forward pass with single hidden layer
         z1 = x_batch @ W1 + b1
         a1 = relu(z1)
         z2 = a1 @ W2 + b2
         probs = softmax(z2)
-        
+
         # Calculate loss
         loss = cross_entropy(probs, y_batch)
         batch_losses.append(loss)
-        
+
         # Backpropagation
         dz2 = (probs - y_batch) / batch_size
         dW2 = a1.T @ dz2
@@ -119,24 +133,25 @@ for epoch in range(epochs):
         dz1 = da1 * relu_derivative(z1)
         dW1 = x_batch.T @ dz1
         db1 = np.sum(dz1, axis=0, keepdims=True)
-        
+
         # Update parameters with fixed learning rate
         W1 -= learning_rate * dW1
         b1 -= learning_rate * db1
         W2 -= learning_rate * dW2
         b2 -= learning_rate * db2
-    
+
     # Evaluate after each epoch
     test_probs = softmax(relu(X_test @ W1 + b1) @ W2 + b2)
     test_acc = accuracy(test_probs, y_test_oh)
     test_accuracies.append(test_acc)
-    
+
     # Average loss for this epoch
     avg_loss = np.mean(batch_losses)
     train_losses.append(avg_loss)
-    
+
     # Print progress
-    print(f"Epoch {epoch+1}/{epochs} - Loss: {avg_loss:.4f} - Test Acc: {test_acc:.4f}")
+    print(
+        f"Epoch {epoch+1}/{epochs} - Loss: {avg_loss:.4f} - Test Acc: {test_acc:.4f}")
 
 # === Final Evaluation ===
 final_probs = softmax(relu(X_test @ W1 + b1) @ W2 + b2)
@@ -144,32 +159,38 @@ predicted_classes = np.argmax(final_probs, axis=1)
 true_classes = y_test
 
 # Calculate confusion matrix
+
+
 def confusion_matrix(y_true, y_pred, num_classes):
     cm = np.zeros((num_classes, num_classes), dtype=int)
     for i in range(len(y_true)):
         cm[y_true[i]][y_pred[i]] += 1
     return cm
 
+
 cm = confusion_matrix(true_classes, predicted_classes, num_classes)
 
 # Calculate precision, recall, and F1 score
+
+
 def calculate_metrics(cm):
     precision = np.zeros(num_classes)
     recall = np.zeros(num_classes)
     f1 = np.zeros(num_classes)
-    
+
     for i in range(num_classes):
         # Precision = TP / (TP + FP)
         precision[i] = cm[i, i] / max(np.sum(cm[:, i]), 1)
-        
+
         # Recall = TP / (TP + FN)
         recall[i] = cm[i, i] / max(np.sum(cm[i, :]), 1)
-        
+
         # F1 = 2 * (precision * recall) / (precision + recall)
         if precision[i] + recall[i] > 0:
             f1[i] = 2 * precision[i] * recall[i] / (precision[i] + recall[i])
-    
+
     return precision, recall, f1
+
 
 precision, recall, f1 = calculate_metrics(cm)
 
@@ -190,7 +211,8 @@ print("\nClassification Report:")
 print(f"{'Genre':<12} {'precision':>10} {'recall':>10} {'f1-score':>10}")
 print("-" * 45)
 for i in range(num_classes):
-    print(f"{GENRE_MAP[i]:<12} {precision[i]:>10.2f} {recall[i]:>10.2f} {f1[i]:>10.2f}")
+    print(
+        f"{GENRE_MAP[i]:<12} {precision[i]:>10.2f} {recall[i]:>10.2f} {f1[i]:>10.2f}")
 
 # Calculate overall metrics
 accuracy = np.sum(np.diag(cm)) / np.sum(cm)
@@ -208,7 +230,8 @@ print("\nSample Predictions:")
 for i in range(min(20, len(predicted_classes))):
     pred = predicted_classes[i]
     actual = true_classes[i]
-    print(f"Sample {i+1}: Predicted = {GENRE_MAP[pred]} ({pred}), Actual = {GENRE_MAP[actual]} ({actual})")
+    print(
+        f"Sample {i+1}: Predicted = {GENRE_MAP[pred]} ({pred}), Actual = {GENRE_MAP[actual]} ({actual})")
 
 # Plot training progress
 try:
@@ -229,3 +252,6 @@ try:
     print("\nTraining progress plot saved as 'training_progress.png'")
 except Exception as e:
     print(f"\nCouldn't create plot: {e}")
+
+
+# Could be interesting to try with only these features, becasue forward selection chose these as the best features: ['rmse_var', 'mfcc_5_mean', 'mfcc_6_mean', 'mfcc_1_std', 'mfcc_2_mean', 'chroma_stft_11_mean', 'mfcc_5_std', 'mfcc_1_mean', 'mfcc_4_mean', 'mfcc_3_std', 'chroma_stft_7_std']
