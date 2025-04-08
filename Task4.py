@@ -1,9 +1,11 @@
 import numpy as np
 import pandas as pd
+import formatDataToUse as fdtu
 import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.metrics import confusion_matrix, precision_score, recall_score, f1_score, classification_report
 
 # === Load all datasets ===
-
 
 def load_dataset(path):
     df = pd.read_csv(path, sep='\t')
@@ -45,7 +47,6 @@ print(f"Train set: {X_train.shape}, Test set: {X_test.shape}")
 
 # === One-hot encode labels ===
 
-
 def one_hot(y, num_classes):
     return np.eye(num_classes)[y]
 
@@ -55,7 +56,6 @@ y_train_oh = one_hot(y_train, num_classes)
 y_test_oh = one_hot(y_test, num_classes)
 
 # === Neural Network Functions ===
-
 
 def relu(x):
     return np.maximum(0, x)
@@ -87,7 +87,7 @@ input_size = X_train.shape[1]
 hidden_size = 64  # Single hidden layer with 64 neurons, exactly as original
 output_size = num_classes
 learning_rate = 0.01  # Fixed learning rate as in original
-epochs = 150  # 50 epochs as in original
+epochs = 10  # 50 epochs as in original
 batch_size = 64  # 64 batch size as in original
 
 # Use the same initialization as original code
@@ -158,54 +158,30 @@ final_probs = softmax(relu(X_test @ W1 + b1) @ W2 + b2)
 predicted_classes = np.argmax(final_probs, axis=1)
 true_classes = y_test
 
-# Calculate confusion matrix
-
-
-def confusion_matrix(y_true, y_pred, num_classes):
-    cm = np.zeros((num_classes, num_classes), dtype=int)
-    for i in range(len(y_true)):
-        cm[y_true[i]][y_pred[i]] += 1
-    return cm
-
-
-cm = confusion_matrix(true_classes, predicted_classes, num_classes)
-
-# Calculate precision, recall, and F1 score
-
-
-def calculate_metrics(cm):
-    precision = np.zeros(num_classes)
-    recall = np.zeros(num_classes)
-    f1 = np.zeros(num_classes)
-
-    for i in range(num_classes):
-        # Precision = TP / (TP + FP)
-        precision[i] = cm[i, i] / max(np.sum(cm[:, i]), 1)
-
-        # Recall = TP / (TP + FN)
-        recall[i] = cm[i, i] / max(np.sum(cm[i, :]), 1)
-
-        # F1 = 2 * (precision * recall) / (precision + recall)
-        if precision[i] + recall[i] > 0:
-            f1[i] = 2 * precision[i] * recall[i] / (precision[i] + recall[i])
-
-    return precision, recall, f1
-
-
-precision, recall, f1 = calculate_metrics(cm)
-
 # GENRE_MAP for output
 GENRE_MAP = {
     0: "pop", 1: "metal", 2: "disco", 3: "blues", 4: "reggae",
     5: "classical", 6: "rock", 7: "hiphop", 8: "country", 9: "jazz"
 }
 
+# === Calculate and Plot Confusion Matrix using sklearn ===
+cm = confusion_matrix(true_classes, predicted_classes)
+
+# Create genre name list from GENRE_MAP
+genre_names = [GENRE_MAP[i] for i in range(num_classes)]
+
+# Plot the confusion matrix
+print("\nConfusion Matrix:")
+fdtu.plot_confusion_matrix(cm, genre_names)
+
+# === Calculate Metrics using sklearn ===
+precision = precision_score(true_classes, predicted_classes, average=None)
+recall = recall_score(true_classes, predicted_classes, average=None)
+f1 = f1_score(true_classes, predicted_classes, average=None)
+
 # Print results
 print("\nTraining complete!")
 print(f"Final Test Accuracy: {test_accuracies[-1]*100:.2f}%")
-
-print("\nConfusion Matrix:")
-print(cm)
 
 print("\nClassification Report:")
 print(f"{'Genre':<12} {'precision':>10} {'recall':>10} {'f1-score':>10}")
@@ -214,11 +190,18 @@ for i in range(num_classes):
     print(
         f"{GENRE_MAP[i]:<12} {precision[i]:>10.2f} {recall[i]:>10.2f} {f1[i]:>10.2f}")
 
+# Get complete classification report from sklearn
+print("\nDetailed Classification Report from sklearn:")
+report = classification_report(true_classes, predicted_classes, 
+                              target_names=genre_names, 
+                              digits=4)
+print(report)
+
 # Calculate overall metrics
 accuracy = np.sum(np.diag(cm)) / np.sum(cm)
-macro_precision = np.mean(precision)
-macro_recall = np.mean(recall)
-macro_f1 = np.mean(f1)
+macro_precision = precision_score(true_classes, predicted_classes, average='macro')
+macro_recall = recall_score(true_classes, predicted_classes, average='macro')
+macro_f1 = f1_score(true_classes, predicted_classes, average='macro')
 
 print("\nAccuracy: {:.4f}".format(accuracy))
 print("Macro Precision: {:.4f}".format(macro_precision))

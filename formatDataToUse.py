@@ -1,6 +1,8 @@
 import pandas as pd
 import os 
 import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 
 
@@ -24,7 +26,16 @@ def get_features_dict(data, list_feat):
     
         
     return feature_map
-        
+
+def plot_confusion_matrix(cm, class_names):
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', 
+                xticklabels=class_names, 
+                yticklabels=class_names)
+    plt.xlabel('Predicted')
+    plt.ylabel('True')
+    plt.title('Confusion Matrix')
+    plt.show()
         
 def create_data(feature_map, features, target, partition):
     training_data = []

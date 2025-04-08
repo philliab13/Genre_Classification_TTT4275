@@ -108,6 +108,20 @@ predictions = knn_predict(train_X, train_y, test_X, k=5)
 print("Classification Report (macro avg):")
 print(classification_report(test_y, predictions, zero_division=0))
 
+print("Confusion Matrix:")
+cm = confusion_matrix(test_y, predictions)
+def plot_cm(cm, labels):
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+
+    plt.figure(figsize=(10, 7))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=labels, yticklabels=labels)
+    plt.xlabel('Predicted')
+    plt.ylabel('True')
+    plt.title('Confusion Matrix')
+    plt.show()
+plot_cm(cm, np.unique(test_y))
+
 
 # Output:
 # Selected 4 features for your model:
