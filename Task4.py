@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from plotting import plot_cm
 import formatDataToUse as fdtu
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -87,7 +88,7 @@ input_size = X_train.shape[1]
 hidden_size = 64  # Single hidden layer with 64 neurons, exactly as original
 output_size = num_classes
 learning_rate = 0.01  # Fixed learning rate as in original
-epochs = 10  # 50 epochs as in original
+epochs = 150  # 50 epochs as in original
 batch_size = 64  # 64 batch size as in original
 
 # Use the same initialization as original code
@@ -170,9 +171,6 @@ cm = confusion_matrix(true_classes, predicted_classes)
 # Create genre name list from GENRE_MAP
 genre_names = [GENRE_MAP[i] for i in range(num_classes)]
 
-# Plot the confusion matrix
-print("\nConfusion Matrix:")
-fdtu.plot_confusion_matrix(cm, genre_names)
 
 # === Calculate Metrics using sklearn ===
 precision = precision_score(true_classes, predicted_classes, average=None)
@@ -236,5 +234,7 @@ try:
 except Exception as e:
     print(f"\nCouldn't create plot: {e}")
 
-
+# Plot the confusion matrix
+print("\nConfusion Matrix:")
+plot_cm(cm, genre_names)
 # Could be interesting to try with only these features, becasue forward selection chose these as the best features: ['rmse_var', 'mfcc_5_mean', 'mfcc_6_mean', 'mfcc_1_std', 'mfcc_2_mean', 'chroma_stft_11_mean', 'mfcc_5_std', 'mfcc_1_mean', 'mfcc_4_mean', 'mfcc_3_std', 'chroma_stft_7_std']

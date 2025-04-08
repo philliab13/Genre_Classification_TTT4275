@@ -27,15 +27,6 @@ def get_features_dict(data, list_feat):
         
     return feature_map
 
-def plot_confusion_matrix(cm, class_names):
-    plt.figure(figsize=(10, 8))
-    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', 
-                xticklabels=class_names, 
-                yticklabels=class_names)
-    plt.xlabel('Predicted')
-    plt.ylabel('True')
-    plt.title('Confusion Matrix')
-    plt.show()
         
 def create_data(feature_map, features, target, partition):
     training_data = []
@@ -44,7 +35,6 @@ def create_data(feature_map, features, target, partition):
     testing_labels = []
     n_training = round(len(feature_map[features[0]])*partition)
     n_testing = round(len(feature_map[features[0]])*(1-partition))
-    print(n_training,n_testing)
 
     for i in range(n_training):
 
@@ -164,5 +154,5 @@ def error_counting_approach(N_i,k_i,M):
     P=binomialCoeff(N_i,k_i)*(P_i**k_i)*((1-P_i)**(N_i-k_i))
     return P
 
-print(error_counting_approach(20,9,10))
+print("Initializing the program.......")
     

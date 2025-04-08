@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
-from formatDataToUse import *
+import formatDataToUse as fdtu
+from plotting import plot_cm
 from collections import Counter
 from sklearn.metrics import classification_report, confusion_matrix
 
@@ -9,7 +10,7 @@ from sklearn.metrics import classification_report, confusion_matrix
 
 
 # Load and Prepare Data
-data = get_data("GenreClassData_30s.txt")
+data = fdtu.get_data("GenreClassData_30s.txt")
 train_data = data[data["Type"] == "Train"]
 
 # Target and feature preparation
@@ -80,12 +81,12 @@ for i, f in enumerate(selected_features, 1):
     print(f"{i}. {f}")
 
 # Prepare Data for Classification
-feat_dict = get_features_dict(data, selected_features + ["GenreID"])
-train_X, train_y, test_X, test_y = create_data(feat_dict, selected_features, "GenreID", 0.8)
+feat_dict = fdtu.get_features_dict(data, selected_features + ["GenreID"])
+train_X, train_y, test_X, test_y = fdtu.create_data(feat_dict, selected_features, "GenreID", 0.8)
 
 #normalization of data z-score
-train_X = normalize_z_score(train_X)
-test_X = normalize_z_score(test_X)
+train_X = fdtu.normalize_z_score(train_X)
+test_X = fdtu.normalize_z_score(test_X)
 
 
 # Implement k-NN (k=5)
@@ -105,22 +106,17 @@ def knn_predict(train_X, train_y, test_X, k=5):
 # Predict and Evaluate 
 predictions = knn_predict(train_X, train_y, test_X, k=5)
 
-print("Classification Report (macro avg):")
+print("Classification Report:")
 print(classification_report(test_y, predictions, zero_division=0))
 
-print("Confusion Matrix:")
+#Plotting the confusion matrix
 cm = confusion_matrix(test_y, predictions)
-def plot_cm(cm, labels):
-    import matplotlib.pyplot as plt
-    import seaborn as sns
 
-    plt.figure(figsize=(10, 7))
-    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=labels, yticklabels=labels)
-    plt.xlabel('Predicted')
-    plt.ylabel('True')
-    plt.title('Confusion Matrix')
-    plt.show()
-plot_cm(cm, np.unique(test_y))
+GENRE_MAP = {
+    0: "pop", 1: "metal", 2: "disco", 3: "blues", 4: "reggae",
+    5: "classical", 6: "rock", 7: "hiphop", 8: "country", 9: "jazz"
+}
+plot_cm(cm, [GENRE_MAP[i] for i in range(len(GENRE_MAP))])
 
 
 # Output:
