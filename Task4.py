@@ -1,52 +1,50 @@
 import numpy as np
 import pandas as pd
 from plotting import plot_cm
-import formatDataToUse as fdtu
 import matplotlib.pyplot as plt
-import seaborn as sns
 from sklearn.metrics import confusion_matrix, precision_score, recall_score, f1_score, classification_report
 
 # === Load all datasets ===
 
+
 def load_dataset(path):
     df = pd.read_csv(path, sep='\t')
-    # Drop Track ID, File, Genre, Type as in your original code
-    df = df.drop(columns=["Track ID", "File",
-                 "Genre", "Type"], errors="ignore")
+    # Keep "Type" for deterministic split
+    df = df.drop(columns=["Track ID", "File", "Genre"], errors="ignore")
     return df
 
 
-# Load all 3 datasets
+# Load and combine
 print("Loading datasets...")
 df_5s = load_dataset("Classification_music/GenreClassData_5s.txt")
 df_10s = load_dataset("Classification_music/GenreClassData_10s.txt")
 df_30s = load_dataset("Classification_music/GenreClassData_30s.txt")
 
-# Combine them directly as in original code
 df_all = pd.concat([df_5s, df_10s, df_30s], axis=0).reset_index(drop=True)
 print(f"Combined dataset shape: {df_all.shape}")
 
-# === Prepare features and labels ===
-X = df_all.drop(columns=["GenreID"]).values
+# Prepare features and labels
+types = df_all["Type"].values  # Save "Type" before dropping it
+X = df_all.drop(columns=["GenreID", "Type"], errors="ignore").values
 y = df_all["GenreID"].astype(int).values
 print(f"X shape: {X.shape}, y shape: {y.shape}")
 
-# === Z-score normalization ===
+# Z-score normalization
 print("Normalizing features...")
 X_mean = X.mean(axis=0)
-X_std = X.std(axis=0) + 1e-8  # avoid division by zero
+X_std = X.std(axis=0) + 1e-8
 X_norm = (X - X_mean) / X_std
 
-# === Random Train/Test split (80/20) as in original code ===
-np.random.seed(42)  # For reproducibility
-indices = np.arange(len(X_norm))
-np.random.shuffle(indices)
-split_idx = int(0.8 * len(X_norm))
-X_train, X_test = X_norm[indices[:split_idx]], X_norm[indices[split_idx:]]
-y_train, y_test = y[indices[:split_idx]], y[indices[split_idx:]]
+# Deterministic train/test split
+is_train = types == "Train"
+is_test = types == "Test"
+X_train, X_test = X_norm[is_train], X_norm[is_test]
+y_train, y_test = y[is_train], y[is_test]
 print(f"Train set: {X_train.shape}, Test set: {X_test.shape}")
 
+
 # === One-hot encode labels ===
+
 
 def one_hot(y, num_classes):
     return np.eye(num_classes)[y]
@@ -57,6 +55,7 @@ y_train_oh = one_hot(y_train, num_classes)
 y_test_oh = one_hot(y_test, num_classes)
 
 # === Neural Network Functions ===
+
 
 def relu(x):
     return np.maximum(0, x)
@@ -85,7 +84,7 @@ def accuracy(preds, labels):
 print("Initializing neural network...")
 np.random.seed(42)
 input_size = X_train.shape[1]
-hidden_size = 64  # Single hidden layer with 64 neurons, exactly as original
+hidden_size = 10  # Single hidden layer with 64 neurons, exactly as original
 output_size = num_classes
 learning_rate = 0.01  # Fixed learning rate as in original
 epochs = 150  # 50 epochs as in original
@@ -100,6 +99,7 @@ b2 = np.zeros((1, output_size))
 # === Training Loop without early stopping (as in original) ===
 print("Training neural network...")
 train_losses = []
+train_accuracies = []
 test_accuracies = []
 
 for epoch in range(epochs):
@@ -141,10 +141,15 @@ for epoch in range(epochs):
         W2 -= learning_rate * dW2
         b2 -= learning_rate * db2
 
-    # Evaluate after each epoch
+       # Evaluate after each epoch
+    train_probs = softmax(relu(X_train @ W1 + b1) @ W2 + b2)
+    train_acc = accuracy(train_probs, y_train_oh)
+
     test_probs = softmax(relu(X_test @ W1 + b1) @ W2 + b2)
     test_acc = accuracy(test_probs, y_test_oh)
+
     test_accuracies.append(test_acc)
+    train_accuracies.append(train_acc)
 
     # Average loss for this epoch
     avg_loss = np.mean(batch_losses)
@@ -152,7 +157,8 @@ for epoch in range(epochs):
 
     # Print progress
     print(
-        f"Epoch {epoch+1}/{epochs} - Loss: {avg_loss:.4f} - Test Acc: {test_acc:.4f}")
+        f"Epoch {epoch+1}/{epochs} - Loss: {avg_loss:.4f} - Train Acc: {train_acc:.4f} - Test Acc: {test_acc:.4f}")
+
 
 # === Final Evaluation ===
 final_probs = softmax(relu(X_test @ W1 + b1) @ W2 + b2)
@@ -190,14 +196,15 @@ for i in range(num_classes):
 
 # Get complete classification report from sklearn
 print("\nDetailed Classification Report from sklearn:")
-report = classification_report(true_classes, predicted_classes, 
-                              target_names=genre_names, 
-                              digits=4)
+report = classification_report(true_classes, predicted_classes,
+                               target_names=genre_names,
+                               digits=4)
 print(report)
 
 # Calculate overall metrics
 accuracy = np.sum(np.diag(cm)) / np.sum(cm)
-macro_precision = precision_score(true_classes, predicted_classes, average='macro')
+macro_precision = precision_score(
+    true_classes, predicted_classes, average='macro')
 macro_recall = recall_score(true_classes, predicted_classes, average='macro')
 macro_f1 = f1_score(true_classes, predicted_classes, average='macro')
 
@@ -238,3 +245,24 @@ except Exception as e:
 print("\nConfusion Matrix:")
 plot_cm(cm, genre_names)
 # Could be interesting to try with only these features, becasue forward selection chose these as the best features: ['rmse_var', 'mfcc_5_mean', 'mfcc_6_mean', 'mfcc_1_std', 'mfcc_2_mean', 'chroma_stft_11_mean', 'mfcc_5_std', 'mfcc_1_mean', 'mfcc_4_mean', 'mfcc_3_std', 'chroma_stft_7_std']
+plt.figure(figsize=(12, 5))
+
+# Plot Loss
+plt.subplot(1, 2, 1)
+plt.plot(train_losses, label="Train Loss")
+plt.title('Training Loss')
+plt.xlabel('Epochs')
+plt.ylabel('Loss')
+
+# Plot Accuracy
+plt.subplot(1, 2, 2)
+plt.plot(train_accuracies, label="Train Accuracy")
+plt.plot(test_accuracies, label="Test Accuracy")
+plt.title('Accuracy over Epochs')
+plt.xlabel('Epochs')
+plt.ylabel('Accuracy')
+plt.legend()
+
+plt.tight_layout()
+plt.savefig('training_progress.png')
+print("\nUpdated training progress plot saved as 'training_progress.png'")
