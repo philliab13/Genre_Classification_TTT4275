@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-def plot_cm(cm, testing_labels):
+def plot_cm(cm, testing_labels,file_name):
     # Plot the confusion matrix
     plt.figure(figsize=(8, 6))
     plt.imshow(cm, interpolation='nearest', cmap=plt.cm.Blues)
@@ -25,6 +25,7 @@ def plot_cm(cm, testing_labels):
     plt.ylabel('True Label')
     plt.xlabel('Predicted Label')
     plt.tight_layout()
+    plt.savefig(f"{file_name}.png")
     plt.show()
 
 
