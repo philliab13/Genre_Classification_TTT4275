@@ -1,31 +1,7 @@
-# Comparing tempo and spectral_centroid_mean from task 2, one can see that there is less overlap in the spectral_centroid_mean compared to tempo
-# This can probably be a good way of desciding the last feature:
-# You can compute a feature’s ANOVA F-score manually by comparing the variance between classes to the variance within classes. In other words, for each feature you’d do the following:
 
-# Compute the overall mean of the feature.
-# For each class:
-# Compute the class mean.
-# Compute the contribution to the between-class sum of squares: multiply the number of samples in the class by the squared difference between the class mean and the overall mean.
-# Compute the contribution to the within-class sum of squares: sum the squared differences between each sample in that class and the class mean.
-# Calculate mean squares:
-# Mean square between (MSB) = (Between-class sum of squares) / (number of classes – 1)
-# Mean square within (MSW) = (Within-class sum of squares) / (total number of samples – number of classes)
-# F-score: The ratio
-# 𝐹
-# =
-# MSB
-# /
-# MSW
-# F=MSB/MSW.
-
-
-# Should probably also look in the book if there is a way they are choosing features, and use the same method.
-
-# Wrapper methods: There are many different wrapper methods, one can use backaward selection, which starts with all the different features and eliminates one after another to increase the accuracy. This is computantionally heavy,  therefore one could try forward selection instead where I can start with the 3 features already selected and add 1 after another features and see which makes the accuracy the highest.
 from formatDataToUse import *
 from Knn import *
 from plotting import *
-from copy import deepcopy
 import sklearn.metrics as metrics
 import time
 
@@ -51,6 +27,17 @@ def forward_selection_one_feat(base_features, candidate_features, data):
         score.append((feat, acc))
     best_candidate, score_can = max(score, key=lambda x: x[1])
     return best_candidate, score_can, score
+
+
+GENRE_MAP = {
+    0: "pop", 1: "metal", 2: "disco", 3: "blues", 4: "reggae",
+    5: "classical", 6: "rock", 7: "hiphop", 8: "country", 9: "jazz"
+}
+
+# === Calculate and Plot Confusion Matrix using sklearn ===
+
+# Create genre name list from GENRE_MAP
+genre_names = [GENRE_MAP[i] for i in range(10)]
 
 
 data = get_data("GenreClassData_30s.txt")
@@ -83,7 +70,7 @@ print(report)
 
 cm = metrics.confusion_matrix(testing_labels, prediction_testing_points)
 
-plot_cm(cm, testing_labels, "task3_no_norm")
+plot_cm(cm, genre_names, "task3_no_norm")
 
 # Performance with z-score normalizing
 prediction_testing_points_norm_z = knn_predict(
@@ -98,7 +85,7 @@ print(report_norm_z)
 cm_norm_z = metrics.confusion_matrix(
     testing_labels, prediction_testing_points_norm_z)
 
-plot_cm(cm_norm_z, testing_labels, "task3_norm_z")
+plot_cm(cm_norm_z, genre_names, "task3_norm_z")
 print("Execution time: ", (end-start))
 # Normalizing it with the z-score seemed to help, maybe it will be worth trying to assume it is gaussian and see if that changes anything.
 

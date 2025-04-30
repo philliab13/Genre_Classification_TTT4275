@@ -133,7 +133,10 @@ GENRE_MAP = {
     0: "pop", 1: "metal", 2: "disco", 3: "blues", 4: "reggae",
     5: "classical", 6: "rock", 7: "hiphop", 8: "country", 9: "jazz"
 }
-plot_cm(cm, [GENRE_MAP[i] for i in range(len(GENRE_MAP))])
+
+
+plot_cm(cm, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+        file_name="cm_task4embedded.png")
 
 
 # Output:

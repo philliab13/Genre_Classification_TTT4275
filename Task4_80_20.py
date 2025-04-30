@@ -1,10 +1,9 @@
 import numpy as np
 import pandas as pd
 from plotting import plot_cm
-import formatDataToUse as fdtu
 import matplotlib.pyplot as plt
-import seaborn as sns
 from sklearn.metrics import confusion_matrix, precision_score, recall_score, f1_score, classification_report
+from formatDataToUse import *
 
 # === Load all datasets ===
 
@@ -184,39 +183,20 @@ f1 = f1_score(true_classes, predicted_classes, average=None)
 print("\nTraining complete!")
 print(f"Final Test Accuracy: {test_accuracies[-1]*100:.2f}%")
 
-print("\nClassification Report:")
-print(f"{'Genre':<12} {'precision':>10} {'recall':>10} {'f1-score':>10}")
-print("-" * 45)
-for i in range(num_classes):
-    print(
-        f"{GENRE_MAP[i]:<12} {precision[i]:>10.2f} {recall[i]:>10.2f} {f1[i]:>10.2f}")
 
-# Get complete classification report from sklearn
-print("\nDetailed Classification Report from sklearn:")
-report = classification_report(true_classes, predicted_classes,
-                               target_names=genre_names,
-                               digits=4)
-print(report)
+# Get complete classification report from
+print("\nDetailed Classification Report:")
+manual_report = manual_classification_report(
+    true_classes, predicted_classes, target_names=genre_names)
+print(manual_report)
+
 
 # Calculate overall metrics
 accuracy = np.sum(np.diag(cm)) / np.sum(cm)
-macro_precision = precision_score(
-    true_classes, predicted_classes, average='macro')
-macro_recall = recall_score(true_classes, predicted_classes, average='macro')
-macro_f1 = f1_score(true_classes, predicted_classes, average='macro')
+
 
 print("\nAccuracy: {:.4f}".format(accuracy))
-print("Macro Precision: {:.4f}".format(macro_precision))
-print("Macro Recall: {:.4f}".format(macro_recall))
-print("Macro F1: {:.4f}".format(macro_f1))
 
-# Print sample predictions
-print("\nSample Predictions:")
-for i in range(min(20, len(predicted_classes))):
-    pred = predicted_classes[i]
-    actual = true_classes[i]
-    print(
-        f"Sample {i+1}: Predicted = {GENRE_MAP[pred]} ({pred}), Actual = {GENRE_MAP[actual]} ({actual})")
 
 # Plot training progress
 try:
@@ -240,5 +220,5 @@ except Exception as e:
 
 # Plot the confusion matrix
 print("\nConfusion Matrix:")
-plot_cm(cm, genre_names)
+plot_cm(cm, genre_names, file_name="cm_task4_80_20split.png")
 # Could be interesting to try with only these features, becasue forward selection chose these as the best features: ['rmse_var', 'mfcc_5_mean', 'mfcc_6_mean', 'mfcc_1_std', 'mfcc_2_mean', 'chroma_stft_11_mean', 'mfcc_5_std', 'mfcc_1_mean', 'mfcc_4_mean', 'mfcc_3_std', 'chroma_stft_7_std']

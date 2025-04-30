@@ -86,23 +86,10 @@ def normalize_z_score(data):
 
 
 def manual_classification_report(y_true, y_pred, target_names=None):
-    """
-    Generate a classification report similar to sklearn.metrics.classification_report.
-
-    Parameters:
-      y_true: list or array of true labels
-      y_pred: list or array of predicted labels
-      target_names: Optional list of names corresponding to each class label
-
-    Returns:
-      A string report with precision, recall, f1-score, and support for each class.
-    """
-    # Get sorted unique classes from the union of true and predicted labels
     classes = sorted(set(y_true) | set(y_pred))
 
     report_lines = []
 
-    # For each class, calculate TP, FP, FN, and compute metrics.
     for cls in classes:
         tp = sum((yt == cls and yp == cls) for yt, yp in zip(y_true, y_pred))
         fp = sum((yt != cls and yp == cls) for yt, yp in zip(y_true, y_pred))
@@ -122,27 +109,26 @@ def manual_classification_report(y_true, y_pred, target_names=None):
     # Overall accuracy: total correct / total samples.
     accuracy = sum(yt == yp for yt, yp in zip(y_true, y_pred)) / len(y_true)
 
-    # Build a string similar to sklearn's report format.
     header = f"{'':>10} {'precision':>10} {'recall':>10} {'f1-score':>10} {'support':>10}"
     report = header + "\n\n"
     for name, prec, rec, f1, support in report_lines:
-        report += f"{name:>10} {prec:10.2f} {rec:10.2f} {f1:10.2f} {support:10}\n"
+        report += f"{name:>10} {prec:10.3f} {rec:10.3f} {f1:10.3f} {support:10}\n"
 
     report += "\n"
-    report += f"accuracy     {accuracy:10.2f} {len(y_true):10}\n"
+    report += f"accuracy     {accuracy:10.3f} {len(y_true):10}\n"
 
     # Optionally, compute macro and weighted averages.
     macro_precision = sum(x[1] for x in report_lines) / len(report_lines)
     macro_recall = sum(x[2] for x in report_lines) / len(report_lines)
     macro_f1 = sum(x[3] for x in report_lines) / len(report_lines)
 
-    report += f"macro avg   {macro_precision:10.2f} {macro_recall:10.2f} {macro_f1:10.2f} {len(y_true):10}\n"
+    report += f"macro avg   {macro_precision:10.3f} {macro_recall:10.3f} {macro_f1:10.3f} {len(y_true):10}\n"
 
     weighted_precision = sum(x[1] * x[4] for x in report_lines) / len(y_true)
     weighted_recall = sum(x[2] * x[4] for x in report_lines) / len(y_true)
     weighted_f1 = sum(x[3] * x[4] for x in report_lines) / len(y_true)
 
-    report += f"weighted avg{weighted_precision:10.2f} {weighted_recall:10.2f} {weighted_f1:10.2f} {len(y_true):10}\n"
+    report += f"weighted avg{weighted_precision:10.3f} {weighted_recall:10.3f} {weighted_f1:10.3f} {len(y_true):10}\n"
 
     return report
 
